@@ -3,9 +3,13 @@ This repo collects and re-produces models related to domains of question answeri
 
 ## comunity QA
 
-#### Dataset
+### Dataset
 
 WikiQA, TrecQA, InsuranceQA
+
+#### data preprocess on WikiQA
+
+`run preprocess_wiki.ipynb`
 
 ### Pointwise Style
 
@@ -19,7 +23,7 @@ This model is a simple complementation of a Siamese NN QA model with a pointwise
 
 ##### test model
 
-`python siamese.py` --test --model NN`
+`python siamese.py --test --model NN`
 
 #### Siamese-CNN model
 
@@ -31,7 +35,7 @@ This model is a simple complementation of a Siamese CNN QA model with a pointwis
 
 ##### test model
 
-`python siamese.py` --test --model CNN`
+`python siamese.py --test --model CNN`
 
 #### Siamese-RNN model
 
@@ -43,7 +47,7 @@ This model is a simple complementation of a Siamese RNN/LSTM/GRU QA model with a
 
 ##### test model
 
-`python siamese.py` --test --model RNN`
+`python siamese.py --test --model RNN`
 
 #### note
 
@@ -62,7 +66,7 @@ Given a question, a positive answer and a negative answer, this pairwise model c
 
 ##### test model
 
-`python qacnn.py` --test`
+`python qacnn.py --test`
 
 ### Listwise Style
 
@@ -80,12 +84,15 @@ CNN/Daily mail, CBT
 
 #### GA Reader
 
+To be done
 
 #### SA Reader
 
+To be done
 
 #### AoA Reader
 
+To be done
 
 ### Answer Extraction Style
 
@@ -95,13 +102,13 @@ SQuAD, MS MARCO
 
 #### BiDAF
 
+To be done
 
 ### Answer Selection Style
 
 #### Dataset
 
 RACE dataset
-
 
 ## Information
 
