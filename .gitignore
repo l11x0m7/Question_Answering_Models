@@ -99,3 +99,8 @@ ENV/
 
 # mypy
 .mypy_cache/
+
+code/models/*
+code/logs/*
+data/*
+
