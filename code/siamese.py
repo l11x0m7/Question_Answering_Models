@@ -3,6 +3,7 @@ import tensorflow as tf
 import numpy as np
 import os
 import sys
+from copy import deepcopy
 stdout = sys.stdout
 reload(sys)
 sys.stdout = stdout
@@ -61,7 +62,7 @@ class CNNConfig(object):
         self.embedding_size = 100
         if self.embeddings is not None:
             self.embedding_size = embeddings.shape[1]
-        # 不同类型的filter,相当于1-gram,2-gram,3-gram和5-gram
+        # 不同类型的filter，对应不同的尺寸
         self.filter_sizes = [1, 2, 3, 5, 7, 9]
         # 隐层大小
         self.hidden_size = 256
@@ -69,7 +70,7 @@ class CNNConfig(object):
         # 每种filter的数量
         self.num_filters = 128
         self.l2_reg_lambda = 0.
-        self.keep_prob = 0.6
+        self.keep_prob = 0.8
         # 学习率
         self.lr = 0.001
         # contrasive loss 中的 positive loss部分的权重
@@ -105,7 +106,6 @@ class RNNConfig(object):
         self.output_size = 128
         # 每种filter的数量
         self.num_filters = 128
-        self.l2_reg_lambda = 0.
         self.keep_prob = 0.6
         # 学习率
         self.lr = 0.001
@@ -142,7 +142,7 @@ def train(train_corpus, config, val_corpus, eval_train_corpus=None):
                 count += 1
                 if count % 10 == 0:
                     print('[epoch {}, batch {}]Loss:{}'.format(epoch, count, loss))
-            saver.save(sess,'models/siamese_nn/my_model', global_step=epoch)
+            saver.save(sess,'models/siamese_{}/my_model'.format(args.model.lower()), global_step=epoch)
             if eval_train_corpus is not None:
                 train_res = evaluate(sess, model, eval_train_corpus, config)
                 print('[train] ' + train_res)
@@ -195,7 +195,7 @@ def test(corpus, config):
         else:
             model = SiameseRNN(config)
         saver = tf.train.Saver()
-        saver.restore(sess, tf.train.latest_checkpoint('models/qacnn'))
+        saver.restore(sess, tf.train.latest_checkpoint('models/siamese_{}'.format(args.model)))
         print('[test] ' + evaluate(sess, model, corpus, config))
                     
 
@@ -234,7 +234,7 @@ def main(args):
     config.max_q_length = max_q_length
     config.max_a_length = max_a_length
     if args.train:
-        train(train_corpus, config, val_corpus, train_corpus)
+        train(deepcopy(train_corpus), config, val_corpus, deepcopy(train_corpus))
     elif args.test:
         test(test_corpus, config)
 

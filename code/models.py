@@ -3,9 +3,6 @@ import tensorflow as tf
 import numpy as np
 
 class SiameseNN(object):
-    """
-    pairwise学习模型
-    """
     def __init__(self, config):
         self.config = config
         # 输入
@@ -102,9 +99,6 @@ class SiameseNN(object):
 
 
 class SiameseCNN(object):
-    """
-    pairwise学习模型
-    """
     def __init__(self, config):
         self.config = config
         # 输入
@@ -113,7 +107,7 @@ class SiameseCNN(object):
         q_embed, a_embed = self.add_embeddings()
         with tf.variable_scope('siamese') as scope:
             self.q_trans = self.network(q_embed, reuse=False)
-            tf.get_variable_scope().reuse_variables()
+            scope.reuse_variables()
             self.a_trans = self.network(a_embed, reuse=True)
         # 损失和精确度
         self.total_loss = self.add_loss_op(self.q_trans, self.a_trans)
@@ -163,7 +157,7 @@ class SiameseCNN(object):
         n_prev_weight = bottom.get_shape()[1]
         initer = tf.truncated_normal_initializer(stddev=0.01)
         W = tf.get_variable(name+'W', dtype=tf.float32, shape=[n_prev_weight, n_weight], initializer=initer)
-        b = tf.get_variable(name+'b', dtype=tf.float32, initializer=tf.constant(0.01, shape=[n_weight], dtype=tf.float32))
+        b = tf.get_variable(name+'b', dtype=tf.float32, initializer=tf.constant(0.0, shape=[n_weight], dtype=tf.float32))
         fc = tf.nn.bias_add(tf.matmul(bottom, W), b)
         return fc
 
@@ -173,10 +167,10 @@ class SiameseCNN(object):
         h = tf.reshape(h, [-1, max_len, h.get_shape()[2], 1])
         for i, filter_size in enumerate(self.config.filter_sizes):
             with tf.variable_scope('filter{}'.format(filter_size)):
-                conv1_W = tf.get_variable('conv_W', shape=[filter_size, self.config.embedding_size, 1, self.config.num_filters], initializer=tf.truncated_normal_initializer(.0, .1))
-                conv1_b = tf.get_variable('conv_b', initializer=tf.constant(0.1, shape=[self.config.num_filters]))
+                conv1_W = tf.get_variable('conv_W', shape=[filter_size, self.config.embedding_size, 1, self.config.num_filters], initializer=tf.truncated_normal_initializer(.0, .01))
+                conv1_b = tf.get_variable('conv_b', initializer=tf.constant(0.0, shape=[self.config.num_filters]))
                 # pooling层的bias,Q和A分开
-                pool_b = tf.get_variable('pool_b', initializer=tf.constant(0.1, shape=[self.config.num_filters]))
+                pool_b = tf.get_variable('pool_b', initializer=tf.constant(0.0, shape=[self.config.num_filters]))
                 # 卷积
                 out = tf.nn.relu((tf.nn.conv2d(h, conv1_W, [1,1,1,1], padding='VALID')+conv1_b))
                 # 池化
@@ -185,10 +179,10 @@ class SiameseCNN(object):
                 pool.append(out)
                 # 加入正则项
                 if not reuse:
-                    tf.add_to_collection('total_loss', 0.5*self.config.l2_reg_lambda*tf.nn.l2_loss(conv1_W))
+                    tf.add_to_collection('total_loss', 0.5 * self.config.l2_reg_lambda * tf.nn.l2_loss(conv1_W))
 
-        total_channels = len(self.config.filter_sizes)*self.config.num_filters
-        real_pool = tf.reshape(tf.concat(pool, 3), [-1, total_channels])
+        total_channels = len(self.config.filter_sizes) * self.config.num_filters
+        real_pool = tf.reshape(tf.concat(pool, 3), [self.batch_size, total_channels])
         return real_pool
 
     # 损失节点
@@ -220,9 +214,6 @@ class SiameseCNN(object):
 
 
 class SiameseRNN(object):
-    """
-    pairwise学习模型
-    """
     def __init__(self, config):
         self.config = config
         # 输入
@@ -272,7 +263,7 @@ class SiameseRNN(object):
         inputs = tf.transpose(x, [1, 0, 2])
         inputs = tf.reshape(inputs, [-1, self.config.embedding_size])
         inputs = tf.split(inputs, sequence_length, 0)
-        # (batch_size, conv_size)
+        # (batch_size, rnn_output_size)
         rnn1 = self.rnn_layer(inputs)
         # (batch_size, hidden_size)
         fc1 = self.fc_layer(rnn1, self.config.hidden_size, "fc1")
