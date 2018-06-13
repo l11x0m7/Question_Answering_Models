@@ -1,5 +1,5 @@
 # Question_Answering_Models
-This repo collects and re-produces models related to domains of question answering and machine reading comprehension
+This repo collects and re-produces models related to domains of question answering and machine reading comprehension.
 
 ## comunity QA
 
@@ -9,64 +9,58 @@ WikiQA, TrecQA, InsuranceQA
 
 #### data preprocess on WikiQA
 
-
 ```
 bash download.sh
 python preprocess_wiki.py
 ```
 
-### Pointwise Style
-
-#### Siamese-NN model
+### Siamese-NN model
 
 This model is a simple complementation of a Siamese NN QA model with a pointwise way.
 
 [To this repo](./siamese_nn)
 
-##### train model
+#### train model
 
 `python siamese.py --train --model NN`
 
-##### test model
+#### test model
 
 `python siamese.py --test --model NN`
 
-#### Siamese-CNN model
+### Siamese-CNN model
 
 This model is a simple complementation of a Siamese CNN QA model with a pointwise way.
 
 [To this repo](./siamese_cnn)
 
-##### train model
+#### train model
 
 `python siamese.py --train --model CNN`
 
-##### test model
+#### test model
 
 `python siamese.py --test --model CNN`
 
-#### Siamese-RNN model
+### Siamese-RNN model
 
 This model is a simple complementation of a Siamese RNN/LSTM/GRU QA model with a pointwise way.
 
 [To this repo](./siamese_rnn)
 
-##### train model
+#### train model
 
 `python siamese.py --train --model RNN`
 
-##### test model
+#### test model
 
 `python siamese.py --test --model RNN`
 
-#### note
+### note
 
 All these three models above are based on the vanilla siamese structure. You can easily combine these basic deep learning module cells together and build your own models.
 
-
-### Pairwise Style
-
-#### QACNN
+### QACNN
 
 Given a question, a positive answer and a negative answer, this pairwise model can rank two answers with higher ranking in terms of the right answer.
 
@@ -74,99 +68,83 @@ Refer to 《APPLYING DEEP LEARNING TO ANSWER SELECTION:A STUDY AND AN OPEN TASK�
 
 [To this repo](./qacnn)
 
-##### train model
+#### train model
 
 `python qacnn.py --train`
 
-##### test model
+#### test model
 
 `python qacnn.py --test`
 
-### Listwise Style(also can be transformed to pointwise style)
-
-#### Decomposable Attention Model
+### Decomposable Attention Model
 
 Refer to 《A Decomposable Attention Model for Natural Language Inference》
 
 [To this repo](./decomposable_att_model)
 
-##### train model
+#### train model
 
 `python decomp_att.py --train`
 
-##### test model
+#### test model
 
 `python decomp_att.py --test`
 
-#### Compare-Aggregate Model with Multi-Compare
+### Compare-Aggregate Model with Multi-Compare
 
 Refer to 《A COMPARE-AGGREGATE MODEL FOR MATCHING TEXT SEQUENCES》
 
 [To this repo](./seq_match_seq)
 
-##### train model
+#### train model
 
 `python seq_match_seq.py --train`
 
-##### test model
+#### test model
 
 `python seq_match_seq.py --test`
 
-#### BiMPM
+### BiMPM
 
 Refer to 《Bilateral Multi-Perspective Matching for Natural Language Sentence》
 
 [To this repo](./bimpm)
 
-##### train model
+#### train model
 
 `python bimpm.py --train`
 
-##### test model
+#### test model
 
 `python bimpm.py --test`
 
 ## Machine Reading Comprehension
 
-### Cloze Style
+### Dataset
 
-#### Dataset
+CNN/Daily mail, CBT, SQuAD, MS MARCO, RACE
 
-CNN/Daily mail, CBT
-
-#### GA Reader
+### GA Reader
 
 To be done
 
-#### SA Reader
+### SA Reader
 
 To be done
 
-#### AoA Reader
+### AoA Reader
 
 To be done
 
-### Answer Extraction Style
-
-#### Dataset
-
-SQuAD, MS MARCO
-
-#### BiDAF
+### BiDAF
 
 To be done
 
-#### QANet
+### QANet
 
 Refer to 《QANet: Combining Local Convolution with Global Self-Attention for Reading Comprehension》
 
 [To this repo](./QANet)
-
-### Answer Selection Style
-
-#### Dataset
-
-RACE dataset
 
 ## Information
 
