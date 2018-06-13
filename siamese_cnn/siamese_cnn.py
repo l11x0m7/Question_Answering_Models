@@ -8,41 +8,11 @@ stdout = sys.stdout
 reload(sys)
 sys.stdout = stdout
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 import cPickle as pkl
-
 from utils import *
-
-from models import SiameseNN, SiameseCNN, SiameseRNN
-
-class NNConfig(object):
-    def __init__(self, vocab_size, embeddings=None):
-        # 输入问题(句子)长度
-        self.max_q_length = 200
-        # 输入答案长度
-        self.max_a_length = 200
-        # 循环数
-        self.num_epochs = 100
-        # batch大小
-        self.batch_size = 128
-        # 词表大小
-        self.vocab_size = vocab_size
-        self.hidden_size = 256
-        self.output_size = 128
-        self.keep_prob = 0.6
-        # 词向量大小
-        self.embeddings = embeddings
-        self.embedding_size = 100
-        if self.embeddings is not None:
-            self.embedding_size = embeddings.shape[1]
-        # 学习率
-        self.lr = 0.001
-        # contrasive loss 中的 positive loss部分的权重
-        self.pos_weight = 0.25
-
-        self.cf = tf.ConfigProto(allow_soft_placement=True, log_device_placement=False)
-        self.cf.gpu_options.per_process_gpu_memory_fraction = 0.2
+from models import SiameseCNN
 
 
 class CNNConfig(object):
@@ -80,52 +50,12 @@ class CNNConfig(object):
         self.cf.gpu_options.per_process_gpu_memory_fraction = 0.2
 
 
-class RNNConfig(object):
-    def __init__(self, vocab_size, embeddings=None):
-        # 输入问题(句子)长度
-        self.max_q_length = 200
-        # 输入答案长度
-        self.max_a_length = 200
-        # 循环数
-        self.num_epochs = 100
-        # batch大小
-        self.batch_size = 128
-        # 词表大小
-        self.vocab_size = vocab_size
-        # 词向量大小
-        self.embeddings = embeddings
-        self.embedding_size = 100
-        if self.embeddings is not None:
-            self.embedding_size = embeddings.shape[1]
-        # RNN单元类型和大小与堆叠层数
-        self.cell_type = 'GRU'
-        self.rnn_size = 128
-        self.layer_size = 2
-        # 隐层大小
-        self.hidden_size = 256
-        self.output_size = 128
-        # 每种filter的数量
-        self.num_filters = 128
-        self.keep_prob = 0.6
-        # 学习率
-        self.lr = 0.001
-        # contrasive loss 中的 positive loss部分的权重
-        self.pos_weight = 0.5
-
-        self.cf = tf.ConfigProto(allow_soft_placement=True, log_device_placement=False)
-        self.cf.gpu_options.per_process_gpu_memory_fraction = 0.2
-
 
 def train(train_corpus, config, val_corpus, eval_train_corpus=None):
     iterator = Iterator(train_corpus)
 
     with tf.Session(config=config.cf) as sess:
-        if args.model == 'NN':
-            model = SiameseNN(config)
-        elif args.model == 'CNN':
-            model = SiameseCNN(config)
-        else:
-            model = SiameseRNN(config)
+        model = SiameseCNN(config)
         saver = tf.train.Saver()
         sess.run(tf.initialize_all_variables())
         for epoch in xrange(config.num_epochs):
@@ -142,7 +72,7 @@ def train(train_corpus, config, val_corpus, eval_train_corpus=None):
                 count += 1
                 if count % 10 == 0:
                     print('[epoch {}, batch {}]Loss:{}'.format(epoch, count, loss))
-            saver.save(sess,'models/siamese_{}/my_model'.format(args.model.lower()), global_step=epoch)
+            saver.save(sess,'{}/my_model'.format(model_path), global_step=epoch)
             if eval_train_corpus is not None:
                 train_res = evaluate(sess, model, eval_train_corpus, config)
                 print('[train] ' + train_res)
@@ -188,14 +118,9 @@ def evaluate(sess, model, corpus, config):
 
 def test(corpus, config):
     with tf.Session(config=config.cf) as sess:
-        if args.model == 'NN':
-            model = SiameseNN(config)
-        elif args.model == 'CNN':
-            model = SiameseCNN(config)
-        else:
-            model = SiameseRNN(config)
+        model = SiameseCNN(config)
         saver = tf.train.Saver()
-        saver.restore(sess, tf.train.latest_checkpoint('models/siamese_{}'.format(args.model)))
+        saver.restore(sess, tf.train.latest_checkpoint(model_path))
         print('[test] ' + evaluate(sess, model, corpus, config))
                     
 
@@ -225,12 +150,7 @@ def main(args):
     test_ap = padding(test_ap, max_a_length)
     test_corpus = zip(test_qids, test_q, test_aids, test_ap, labels)
 
-    if args.model == 'NN':
-        config = NNConfig(max(word2id.values()) + 1, embeddings=embeddings)
-    elif args.model == 'CNN':
-        config = CNNConfig(max(word2id.values()) + 1, embeddings=embeddings)
-    else:
-        config = RNNConfig(max(word2id.values()) + 1, embeddings=embeddings)
+    config = CNNConfig(max(word2id.values()) + 1, embeddings=embeddings)
     config.max_q_length = max_q_length
     config.max_a_length = max_a_length
     if args.train:
@@ -244,12 +164,12 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("--train",  help="whether to train", action='store_true')
     parser.add_argument("--test",  help="whether to test", action='store_true')
-    parser.add_argument("--model",  help="choose models from nn, cnn, rnn", type=str, default='NN')
     args = parser.parse_args()
 
     raw_data_path = '../data/WikiQA/raw'
     processed_data_path = '../data/WikiQA/processed'
     embedding_path = '../data/embedding/glove.6B.300d.txt'
+    model_path = 'models'
 
     with open(os.path.join(processed_data_path, 'vocab.pkl'), 'r') as fr:
         word2id, id2word = pkl.load(fr)

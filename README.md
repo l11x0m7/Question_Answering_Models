@@ -9,13 +9,19 @@ WikiQA, TrecQA, InsuranceQA
 
 #### data preprocess on WikiQA
 
-`run preprocess_wiki.ipynb`
+
+```
+bash download.sh
+python preprocess_wiki.py
+```
 
 ### Pointwise Style
 
 #### Siamese-NN model
 
 This model is a simple complementation of a Siamese NN QA model with a pointwise way.
+
+[To this repo](./siamese_nn)
 
 ##### train model
 
@@ -29,6 +35,8 @@ This model is a simple complementation of a Siamese NN QA model with a pointwise
 
 This model is a simple complementation of a Siamese CNN QA model with a pointwise way.
 
+[To this repo](./siamese_cnn)
+
 ##### train model
 
 `python siamese.py --train --model CNN`
@@ -40,6 +48,8 @@ This model is a simple complementation of a Siamese CNN QA model with a pointwis
 #### Siamese-RNN model
 
 This model is a simple complementation of a Siamese RNN/LSTM/GRU QA model with a pointwise way.
+
+[To this repo](./siamese_rnn)
 
 ##### train model
 
@@ -60,6 +70,10 @@ All these three models above are based on the vanilla siamese structure. You can
 
 Given a question, a positive answer and a negative answer, this pairwise model can rank two answers with higher ranking in terms of the right answer.
 
+Refer to 《APPLYING DEEP LEARNING TO ANSWER SELECTION:A STUDY AND AN OPEN TASK》
+
+[To this repo](./qacnn)
+
 ##### train model
 
 `python qacnn.py --train`
@@ -68,11 +82,49 @@ Given a question, a positive answer and a negative answer, this pairwise model c
 
 `python qacnn.py --test`
 
-### Listwise Style
+### Listwise Style(also can be transformed to pointwise style)
 
-#### Compare-Aggregate model
+#### Decomposable Attention Model
 
-To be done
+Refer to 《A Decomposable Attention Model for Natural Language Inference》
+
+[To this repo](./decomposable_att_model)
+
+##### train model
+
+`python decomp_att.py --train`
+
+##### test model
+
+`python decomp_att.py --test`
+
+#### Compare-Aggregate Model with Multi-Compare
+
+Refer to 《A COMPARE-AGGREGATE MODEL FOR MATCHING TEXT SEQUENCES》
+
+[To this repo](./seq_match_seq)
+
+##### train model
+
+`python seq_match_seq.py --train`
+
+##### test model
+
+`python seq_match_seq.py --test`
+
+#### BiMPM
+
+Refer to 《Bilateral Multi-Perspective Matching for Natural Language Sentence》
+
+[To this repo](./bimpm)
+
+##### train model
+
+`python bimpm.py --train`
+
+##### test model
+
+`python bimpm.py --test`
 
 ## Machine Reading Comprehension
 
@@ -103,6 +155,12 @@ SQuAD, MS MARCO
 #### BiDAF
 
 To be done
+
+#### QANet
+
+Refer to 《QANet: Combining Local Convolution with Global Self-Attention for Reading Comprehension》
+
+[To this repo](./QANet)
 
 ### Answer Selection Style
 
