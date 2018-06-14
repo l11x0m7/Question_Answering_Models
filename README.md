@@ -10,6 +10,7 @@ WikiQA, TrecQA, InsuranceQA
 #### data preprocess on WikiQA
 
 ```
+cd cQA
 bash download.sh
 python preprocess_wiki.py
 ```
@@ -18,43 +19,43 @@ python preprocess_wiki.py
 
 This model is a simple complementation of a Siamese NN QA model with a pointwise way.
 
-[To this repo](./siamese_nn)
+[To this repo](./cQA/siamese_nn)
 
 #### train model
 
-`python siamese.py --train --model NN`
+`python siamese.py --train`
 
 #### test model
 
-`python siamese.py --test --model NN`
+`python siamese.py --test`
 
 ### Siamese-CNN model
 
 This model is a simple complementation of a Siamese CNN QA model with a pointwise way.
 
-[To this repo](./siamese_cnn)
+[To this repo](./cQA/siamese_cnn)
 
 #### train model
 
-`python siamese.py --train --model CNN`
+`python siamese.py --train`
 
 #### test model
 
-`python siamese.py --test --model CNN`
+`python siamese.py --test`
 
 ### Siamese-RNN model
 
 This model is a simple complementation of a Siamese RNN/LSTM/GRU QA model with a pointwise way.
 
-[To this repo](./siamese_rnn)
+[To this repo](./cQA/siamese_rnn)
 
 #### train model
 
-`python siamese.py --train --model RNN`
+`python siamese.py --train`
 
 #### test model
 
-`python siamese.py --test --model RNN`
+`python siamese.py --test`
 
 ### note
 
@@ -66,7 +67,7 @@ Given a question, a positive answer and a negative answer, this pairwise model c
 
 Refer to 《APPLYING DEEP LEARNING TO ANSWER SELECTION:A STUDY AND AN OPEN TASK》
 
-[To this repo](./qacnn)
+[To this repo](./cQA/qacnn)
 
 #### train model
 
@@ -80,7 +81,7 @@ Refer to 《APPLYING DEEP LEARNING TO ANSWER SELECTION:A STUDY AND AN OPEN TASK�
 
 Refer to 《A Decomposable Attention Model for Natural Language Inference》
 
-[To this repo](./decomposable_att_model)
+[To this repo](./cQA/decomposable_att_model)
 
 #### train model
 
@@ -94,7 +95,7 @@ Refer to 《A Decomposable Attention Model for Natural Language Inference》
 
 Refer to 《A COMPARE-AGGREGATE MODEL FOR MATCHING TEXT SEQUENCES》
 
-[To this repo](./seq_match_seq)
+[To this repo](./cQA/seq_match_seq)
 
 #### train model
 
@@ -108,7 +109,7 @@ Refer to 《A COMPARE-AGGREGATE MODEL FOR MATCHING TEXT SEQUENCES》
 
 Refer to 《Bilateral Multi-Perspective Matching for Natural Language Sentence》
 
-[To this repo](./bimpm)
+[To this repo](./cQA/bimpm)
 
 #### train model
 
@@ -144,7 +145,7 @@ To be done
 
 Refer to 《QANet: Combining Local Convolution with Global Self-Attention for Reading Comprehension》
 
-[To this repo](./QANet)
+[To this repo](./MRC/QANet)
 
 ## Information
 

@@ -102,8 +102,9 @@ ENV/
 
 code/models/*
 code/logs/*
-data/*
+*/data/embedding/
 */models/
 models/
 *.log
 *.DS_Store
+*._*
