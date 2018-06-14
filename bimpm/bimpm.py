@@ -33,16 +33,37 @@ class BiMPMConfig(object):
         if self.embeddings is not None:
             self.embedding_size = embeddings.shape[1]
         # keep_prob=1-dropout
-        self.keep_prob = 0.6
+        self.keep_prob = 0.9
         # 学习率
-        self.lr = 0.0003
-        self.grad_clip = 1
+        self.lr = 0.0005
+        self.grad_clip = 10.
 
-        self.reg = 0
-        self.mem_dim = 128
-        self.cov_dim = 128
-        self.filter_sizes = [2, 3, 4, 5]
-        self.comp_type = 'mul'
+        self.num_classes = 2
+
+        self.with_full_match = True
+        self.with_maxpool_match = False
+        self.with_attentive_match = True
+        self.with_max_attentive_match = False
+
+        self.use_cudnn = False
+        self.with_cosine = True
+        self.with_mp_cosine = True
+        self.cosine_MP_dim = 5
+        self.att_type = "symmetric"
+        self.att_dim = 50
+        self.context_layer_num = 1
+        self.context_lstm_dim = 100
+
+        self.highway_layer_num = 1
+        self.with_highway = True
+        self.with_match_highway = True
+        self.with_aggregation_highway = True
+
+        self.lambda_l2 = 0.0
+        self.with_moving_average = False
+
+        self.aggregation_layer_num = 1
+        self.aggregation_lstm_dim = 100
 
         self.cf = tf.ConfigProto(allow_soft_placement=True, log_device_placement=False)
         self.cf.gpu_options.per_process_gpu_memory_fraction = 0.2
@@ -58,13 +79,15 @@ def train(train_corpus, config, val_corpus, eval_train_corpus=None):
         for epoch in xrange(config.num_epochs):
             count = 0
             for batch_x in iterator.next(config.batch_size, shuffle=True):
-                batch_qids, batch_q, batch_aids, batch_ap, labels = zip(*batch_x)
+                batch_qids, batch_q, batch_ql, batch_aids, batch_ap, batch_al, labels = zip(*batch_x)
                 batch_q = np.asarray(batch_q)
                 batch_ap = np.asarray(batch_ap)
                 labels = np.asarray(labels).astype(np.int32)
                 _, loss = sess.run([model.train_op, model.total_loss], 
                                    feed_dict={model.q:batch_q, 
                                               model.a:batch_ap,
+                                              model.question_lengths:batch_ql,
+                                              model.passage_lengths:batch_al,
                                               model.y:labels,
                                               model.keep_prob:config.keep_prob})
                 count += 1
@@ -89,12 +112,14 @@ def evaluate(sess, model, corpus, config):
     total_labels = []
     total_loss = 0.
     for batch_x in iterator.next(config.batch_size, shuffle=False):
-        batch_qids, batch_q, batch_aids, batch_ap, labels = zip(*batch_x)
+        batch_qids, batch_q, batch_ql, batch_aids, batch_ap, batch_al, labels = zip(*batch_x)
         batch_q = np.asarray(batch_q)
         batch_ap = np.asarray(batch_ap)
         y_hat, loss = sess.run([model.y_hat, model.total_loss], 
                            feed_dict={model.q:batch_q, 
                                       model.a:batch_ap, 
+                                      model.question_lengths:batch_ql,
+                                      model.passage_lengths:batch_al,
                                       model.y:labels,
                                       model.keep_prob:1.})
         y_hat = np.argmax(y_hat, axis=-1)
@@ -134,20 +159,27 @@ def main(args):
     
     train_qids, train_q, train_aids, train_ap, train_labels = zip(*train_corpus)
     train_q = padding(train_q, max_q_length)
+    train_ql = np.sum((train_q > 0).astype(int), axis=1)
     train_ap = padding(train_ap, max_a_length)
-    train_corpus = zip(train_qids, train_q, train_aids, train_ap, train_labels)
+    train_al = np.sum((train_ap > 0).astype(int), axis=1)
+
+    train_corpus = zip(train_qids, train_q, train_ql, train_aids, train_ap, train_al, train_labels)
 
 
     val_qids, val_q, val_aids, val_ap, labels = zip(*val_corpus)
     val_q = padding(val_q, max_q_length)
+    val_ql = np.sum((val_q > 0).astype(int), axis=1)
     val_ap = padding(val_ap, max_a_length)
-    val_corpus = zip(val_qids, val_q, val_aids, val_ap, labels)
+    val_al = np.sum((val_ap > 0).astype(int), axis=1)
+    val_corpus = zip(val_qids, val_q, val_ql, val_aids, val_ap, val_al, labels)
 
 
     test_qids, test_q, test_aids, test_ap, labels = zip(*test_corpus)
     test_q = padding(test_q, max_q_length)
+    test_ql = np.sum((test_q > 0).astype(int), axis=1)
     test_ap = padding(test_ap, max_a_length)
-    test_corpus = zip(test_qids, test_q, test_aids, test_ap, labels)
+    test_al = np.sum((test_ap > 0).astype(int), axis=1)
+    test_corpus = zip(test_qids, test_q, test_ql, test_aids, test_ap, test_al, labels)
 
     config = BiMPMConfig(max(word2id.values()) + 1, embeddings=embeddings)
     config.max_q_length = max_q_length
