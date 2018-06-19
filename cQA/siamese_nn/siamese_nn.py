@@ -46,7 +46,7 @@ class NNConfig(object):
 
 def train(train_corpus, config, val_corpus, eval_train_corpus=None):
     iterator = Iterator(train_corpus)
-    if os.path.exists(model_path):
+    if not os.path.exists(model_path):
         os.mkdir(model_path)
     with tf.Session(config=config.cf) as sess:
         model = SiameseNN(config)

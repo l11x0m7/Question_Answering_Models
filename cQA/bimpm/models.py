@@ -32,9 +32,6 @@ class BiMPM(object):
                 tf.get_variable_scope().reuse_variables()
                 in_passage_repres = self.multi_highway_layer(a_encode, input_dim, self.config.highway_layer_num)
 
-        # in_question_repres = tf.multiply(in_question_repres, tf.expand_dims(question_mask, axis=-1))
-        # in_passage_repres = tf.multiply(in_passage_repres, tf.expand_dims(mask, axis=-1))
-
         # ========Bilateral Matching=====
         (match_representation, match_dim) = self.bilateral_match_func(
                                                 in_question_repres, 
@@ -64,6 +61,9 @@ class BiMPM(object):
         self.train_op = self.add_train_op(self.total_loss)
 
     def add_placeholders(self):
+        """
+        输入的容器
+        """
         # 问题
         self.q = tf.placeholder(tf.int32,
                 shape=[None, self.config.max_q_length],
@@ -72,16 +72,21 @@ class BiMPM(object):
         self.a = tf.placeholder(tf.int32,
                 shape=[None, self.config.max_a_length],
                 name='Ans')
+        # 问题长度
+        self.question_lengths = tf.placeholder(tf.int32, [None])
+        # 答案长度
+        self.passage_lengths = tf.placeholder(tf.int32, [None])
+        # 标签
         self.y = tf.placeholder(tf.int32, shape=[None, ], name='label')
         # drop_out
         self.keep_prob = tf.placeholder(tf.float32, name='keep_prob')
-        self.batch_size = tf.shape(self.q)[0]
         self.dropout_rate = 1 - self.keep_prob
-
-        self.question_lengths = tf.placeholder(tf.int32, [None])
-        self.passage_lengths = tf.placeholder(tf.int32, [None])
+        self.batch_size = tf.shape(self.q)[0]
 
     def add_embeddings(self):
+        """
+        embedding层
+        """
         with tf.variable_scope('embedding'):
             if self.config.embeddings is not None:
                 embeddings = tf.Variable(self.config.embeddings, 
@@ -96,6 +101,7 @@ class BiMPM(object):
 
     def context_encoding(self, q, a):
         """
+        上下文编码层
         q: [batch_size, q_length, embedding_dim]
         a: [batch_size, a_length, embedding_dim]
         """
@@ -106,6 +112,7 @@ class BiMPM(object):
 
     def mlp(self, bottom, size, layer_num, activation, name, use_dropout=True, reuse=None):
         """
+        多层感知机
         bottom: 上层输入
         size: 神经元大小
         layer_num: 神经网络层数
@@ -123,6 +130,9 @@ class BiMPM(object):
         return now
 
     def proj_layer(self, seq, name, reuse=None):
+        """
+        投影层
+        """
         out1 = self.mlp(seq, self.config.context_lstm_dim, 1, 
                     tf.nn.sigmoid, name + '_sigmoid', reuse=reuse)
         out2 = self.mlp(seq, self.config.context_lstm_dim, 1, 
@@ -179,6 +189,15 @@ class BiMPM(object):
     def bilateral_match_func(self, in_question_repres, in_passage_repres,
                         question_lengths, passage_lengths, question_mask, 
                         passage_mask, input_dim):
+        """
+        in_question_repres: 输入的问题表示，[batch_size, question_len, input_dim]
+        in_passage_repres: 输入的答案表示，[batch_size, passage_len, input_dim]
+        question_lengths: 输入的问题长度，[batch_size, ]
+        passage_lengths: 输入的答案长度，[batch_size, ]
+        question_mask: 问题的mask，[batch_size, question_len]
+        passage_mask: 答案的mask，[batch_size, passage_len]
+        input_dim: 输入的维度
+        """
         question_aware_representatins = []
         question_aware_dim = 0
         passage_aware_representatins = []
@@ -332,6 +351,17 @@ class BiMPM(object):
                                     with_full_match=True, with_maxpool_match=True, 
                                     with_attentive_match=True, with_max_attentive_match=True,
                                     dropout_rate=0, forward=True):
+        """
+        context_lstm_dim: LSTM输出维度
+        scope: 变量域名称
+        with_full_match: 是否使用full match
+        with_maxpool_match: 是否使用maxpooling match 
+        with_attentive_match: 是否使用attentive match
+        with_max_attentive_match: 是否使用max attentive match
+        dropout_rate: dropout比例
+        forward: 输入是否是前向序列（从双向RNN得到的输出）
+
+        """
         passage_reps = tf.multiply(passage_reps, tf.expand_dims(passage_mask,-1))
         question_reps = tf.multiply(question_reps, tf.expand_dims(question_mask,-1))
         all_question_aware_representatins = []
@@ -399,16 +429,14 @@ class BiMPM(object):
             all_question_aware_representatins = tf.concat(axis=2, values=all_question_aware_representatins)
         return (all_question_aware_representatins, dim)
 
-
     def multi_perspective_match(self, feature_dim, 
                                 repres1, repres2, 
                                 dropout_rate=0.2,
                                 scope_name='mp-match', 
                                 reuse=False):
         '''
-            :param repres1: [batch_size, len, feature_dim]
-            :param repres2: [batch_size, len, feature_dim]
-            :return:
+        repres1: [batch_size, len, feature_dim]
+        repres2: [batch_size, len, feature_dim]
         '''
         input_shape = tf.shape(repres1)
         batch_size = input_shape[0]
@@ -438,15 +466,21 @@ class BiMPM(object):
         return (matching_result, match_dim)
 
     def cal_relevancy_matrix(self, in_question_repres, in_passage_repres):
+        """
+        in_question_repres: [batch_size, question_len, dim]
+        in_passage_repres: [batch_size, passage_len, dim]
+        """
         in_question_repres_tmp = tf.expand_dims(in_question_repres, 1) # [batch_size, 1, question_len, dim]
         in_passage_repres_tmp = tf.expand_dims(in_passage_repres, 2) # [batch_size, passage_len, 1, dim]
         relevancy_matrix = layer_utils.cosine_distance(in_question_repres_tmp,in_passage_repres_tmp) # [batch_size, passage_len, question_len]
         return relevancy_matrix
 
     def mask_relevancy_matrix(self, relevancy_matrix, question_mask, passage_mask):
-        # relevancy_matrix: [batch_size, passage_len, question_len]
-        # question_mask: [batch_size, question_len]
-        # passage_mask: [batch_size, passsage_len]
+        """
+        relevancy_matrix: [batch_size, passage_len, question_len]
+        question_mask: [batch_size, question_len]
+        passage_mask: [batch_size, passsage_len]
+        """
         relevancy_matrix = tf.multiply(relevancy_matrix, tf.expand_dims(question_mask, 1))
         relevancy_matrix = tf.multiply(relevancy_matrix, tf.expand_dims(passage_mask, 2))
         return relevancy_matrix
@@ -454,8 +488,10 @@ class BiMPM(object):
     def cal_max_question_representation(self, 
                                         question_representation, 
                                         atten_scores):
-        # question_representation: [batch_size, q_len, dim]
-        # atten_scores: [batch_size, passage_len, q_len]
+        """
+        question_representation: [batch_size, q_len, dim]
+        atten_scores: [batch_size, passage_len, q_len]
+        """
         atten_positions = tf.argmax(atten_scores, axis=2, 
                             output_type=tf.int32)
         max_question_reps = layer_utils.collect_representation(
@@ -465,9 +501,11 @@ class BiMPM(object):
 
     def cal_maxpooling_matching(self, passage_rep, 
                                 question_rep, decompose_params):
-        # passage_representation: [batch_size, passage_len, dim]
-        # qusetion_representation: [batch_size, question_len, dim]
-        # decompose_params: [decompose_dim, dim]
+        """
+        passage_representation: [batch_size, passage_len, dim]
+        qusetion_representation: [batch_size, question_len, dim]
+        decompose_params: [decompose_dim, dim]
+        """
         def multi_perspective_expand_for_2D(in_tensor, decompose_params):
             in_tensor = tf.expand_dims(in_tensor, axis=1) #[batch_size, 'x', dim]
             decompose_params = tf.expand_dims(decompose_params, axis=0) # [1, decompse_dim, dim]
@@ -487,7 +525,10 @@ class BiMPM(object):
         return tf.concat(axis=2, values=[tf.reduce_max(matching_matrix, axis=2), tf.reduce_mean(matching_matrix, axis=2)])# [batch_size, passage_len, 2*decompse_dim]
 
     def highway_layer(self, in_val, output_size, scope=None):
-        # in_val: [batch_size, passage_len, dim]
+        """
+        单层highway网络
+        in_val: [batch_size, passage_len, dim]
+        """
         input_shape = tf.shape(in_val)
         batch_size = input_shape[0]
         passage_len = input_shape[1]
@@ -505,6 +546,10 @@ class BiMPM(object):
         return outputs
 
     def multi_highway_layer(self, in_val, output_size, num_layers, scope=None):
+        """
+        多层highway网络
+        in_val: [batch_size, passage_len, dim]
+        """
         scope_name = 'highway_layer'
         if scope is not None: scope_name = scope
         for i in xrange(num_layers):

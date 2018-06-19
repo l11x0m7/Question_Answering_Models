@@ -23,6 +23,48 @@ class DecompAtt(object):
         # 训练节点
         self.train_op = self.add_train_op(self.total_loss)
 
+    def add_placeholders(self):
+        """
+        输入的容器
+        """
+        # 问题
+        self.q = tf.placeholder(tf.int32,
+                shape=[None, self.config.max_q_length],
+                name='Question')
+        # 回答
+        self.a = tf.placeholder(tf.int32,
+                shape=[None, self.config.max_a_length],
+                name='Ans')
+        self.y = tf.placeholder(tf.int32, shape=[None, ], name='label')
+        # drop_out
+        self.keep_prob = tf.placeholder(tf.float32, name='keep_prob')
+        self.batch_size = tf.shape(self.q)[0]
+
+    def add_embeddings(self):
+        """
+        embedding层
+        """
+        with tf.variable_scope('embedding'):
+            if self.config.embeddings is not None:
+                embeddings = tf.Variable(self.config.embeddings, name="embeddings", trainable=False)
+            else:
+                embeddings = tf.get_variable('embeddings', shape=[self.config.vocab_size, self.config.embedding_size], initializer=tf.uniform_unit_scaling_initializer())
+            q_embed = tf.nn.embedding_lookup(embeddings, self.q)
+            a_embed = tf.nn.embedding_lookup(embeddings, self.a)
+            return q_embed, a_embed
+
+    def context_encoding(self, q, a):
+        """
+        q: [batch_size, q_length, embedding_dim]
+        a: [batch_size, a_length, embedding_dim]
+        """
+        with tf.variable_scope('context_encoding') as scope:
+            q = tf.nn.dropout(q, keep_prob=self.keep_prob)
+            a = tf.nn.dropout(a, keep_prob=self.keep_prob)
+            q_encode = self.rnn_layer(q)
+            tf.get_variable_scope().reuse_variables() 
+            a_encode = self.rnn_layer(a)
+        return q_encode, a_encode
 
     def attend(self, q, a):
         """
@@ -80,43 +122,6 @@ class DecompAtt(object):
         pred = tf.layers.dense(pred, 2, activation=None, name='prediction')
         return pred
 
-    def add_placeholders(self):
-        # 问题
-        self.q = tf.placeholder(tf.int32,
-                shape=[None, self.config.max_q_length],
-                name='Question')
-        # 回答
-        self.a = tf.placeholder(tf.int32,
-                shape=[None, self.config.max_a_length],
-                name='Ans')
-        self.y = tf.placeholder(tf.int32, shape=[None, ], name='label')
-        # drop_out
-        self.keep_prob = tf.placeholder(tf.float32, name='keep_prob')
-        self.batch_size = tf.shape(self.q)[0]
-
-    def add_embeddings(self):
-        with tf.variable_scope('embedding'):
-            if self.config.embeddings is not None:
-                embeddings = tf.Variable(self.config.embeddings, name="embeddings", trainable=False)
-            else:
-                embeddings = tf.get_variable('embeddings', shape=[self.config.vocab_size, self.config.embedding_size], initializer=tf.uniform_unit_scaling_initializer())
-            q_embed = tf.nn.embedding_lookup(embeddings, self.q)
-            a_embed = tf.nn.embedding_lookup(embeddings, self.a)
-            return q_embed, a_embed
-
-    def context_encoding(self, q, a):
-        """
-        q: [batch_size, q_length, embedding_dim]
-        a: [batch_size, a_length, embedding_dim]
-        """
-        with tf.variable_scope('context_encoding') as scope:
-            q = tf.nn.dropout(q, keep_prob=self.keep_prob)
-            a = tf.nn.dropout(a, keep_prob=self.keep_prob)
-            q_encode = self.rnn_layer(q)
-            tf.get_variable_scope().reuse_variables() 
-            a_encode = self.rnn_layer(a)
-        return q_encode, a_encode
-
     def mlp(self, bottom, size, layer_num, name, reuse=None):
         """
         bottom: 上层输入
@@ -134,6 +139,9 @@ class DecompAtt(object):
         return now
 
     def rnn_layer(self, h):
+        """
+        RNN层
+        """
         sequence_length = h.get_shape()[1]
         # (batch_size, time_step, embed_size) -> (time_step, batch_size, embed_size)
         inputs = tf.transpose(h, [1, 0, 2])
@@ -150,6 +158,9 @@ class DecompAtt(object):
         return output_x1
 
     def bi_lstm(self, rnn_size, layer_size, keep_prob):
+        """
+        双向LSTM
+        """
         # forward rnn
         with tf.name_scope('fw_rnn'), tf.variable_scope('fw_rnn'):
             lstm_fw_cell_list = [tf.contrib.rnn.LSTMCell(rnn_size) for _ in xrange(layer_size)]
@@ -163,6 +174,9 @@ class DecompAtt(object):
         return lstm_fw_cell_m, lstm_bw_cell_m
 
     def bi_gru(self, rnn_size, layer_size, keep_prob):
+        """
+        双向GRU
+        """
         # forward rnn
         with tf.name_scope('fw_rnn'), tf.variable_scope('fw_rnn'):
             gru_fw_cell_list = [tf.contrib.rnn.GRUCell(rnn_size) for _ in xrange(layer_size)]

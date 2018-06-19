@@ -19,8 +19,10 @@ class SiameseCNN(object):
         # 训练节点
         self.train_op = self.add_train_op(self.total_loss)
 
-    # 输入
     def add_placeholders(self):
+        """
+        输入的容器
+        """
         # 问题
         self.q = tf.placeholder(tf.int32,
                 shape=[None, self.config.max_q_length],
@@ -34,8 +36,10 @@ class SiameseCNN(object):
         self.keep_prob = tf.placeholder(tf.float32, name='keep_prob')
         self.batch_size = tf.shape(self.q)[0]
 
-    # word embeddings
     def add_embeddings(self):
+        """
+        embedding层
+        """
         with tf.variable_scope('embedding'):
             if self.config.embeddings is not None:
                 embeddings = tf.Variable(self.config.embeddings, name="embeddings", trainable=False)
@@ -48,6 +52,9 @@ class SiameseCNN(object):
             return q_embed, a_embed
 
     def network(self, x, reuse=False):
+        """
+        核心网络
+        """
         # (batch_size, conv_size)
         conv1 = self.conv_layer(x, reuse=reuse)
         # (batch_size, hidden_size)
@@ -58,6 +65,9 @@ class SiameseCNN(object):
         return fc2
 
     def fc_layer(self, bottom, n_weight, name):
+        """
+        全连接层
+        """
         assert len(bottom.get_shape()) == 2
         n_prev_weight = bottom.get_shape()[1]
         initer = tf.truncated_normal_initializer(stddev=0.01)
@@ -67,6 +77,9 @@ class SiameseCNN(object):
         return fc
 
     def conv_layer(self, h, reuse=False):
+        """
+        卷积层
+        """
         pool = list()
         max_len = h.get_shape()[1]
         h = tf.reshape(h, [-1, max_len, h.get_shape()[2], 1])
@@ -90,8 +103,10 @@ class SiameseCNN(object):
         real_pool = tf.reshape(tf.concat(pool, 3), [self.batch_size, total_channels])
         return real_pool
 
-    # 损失节点
     def add_loss_op(self, o1, o2):
+        """
+        损失节点
+        """
         # 此处用cos距离
         norm_o1 = tf.nn.l2_normalize(o1, dim=1)
         norm_o2 = tf.nn.l2_normalize(o2, dim=1)
@@ -103,13 +118,18 @@ class SiameseCNN(object):
         return total_loss
 
     def contrastive_loss(self, Ew, y):
+        """
+        contrasive_loss
+        """
         l_1 = self.config.pos_weight * tf.square(1 - Ew)
         l_0 = tf.square(tf.maximum(Ew, 0))
         loss = tf.reduce_mean(y * l_1 + (1 - y) * l_0)
         return loss
 
-    # 训练节点
     def add_train_op(self, loss):
+        """
+        训练节点
+        """
         with tf.name_scope('train_op'):
             # 记录训练步骤
             self.global_step = tf.Variable(0, name='global_step', trainable=False)

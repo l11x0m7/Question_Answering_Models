@@ -25,6 +25,9 @@ class SeqMatchSeq(object):
         self.train_op = self.add_train_op(self.total_loss)
 
     def add_placeholders(self):
+        """
+        输入的容器
+        """
         # 问题
         self.q = tf.placeholder(tf.int32,
                 shape=[None, self.config.max_q_length],
@@ -39,6 +42,9 @@ class SeqMatchSeq(object):
         self.batch_size = tf.shape(self.q)[0]
 
     def add_embeddings(self):
+        """
+        embedding层
+        """
         with tf.variable_scope('embedding'):
             if self.config.embeddings is not None:
                 embeddings = tf.Variable(self.config.embeddings, 
@@ -119,6 +125,9 @@ class SeqMatchSeq(object):
         return out
 
     def soft_out(self, x):
+        """
+        最后的输出层
+        """
         out = self.mlp(x, 2, 1, None, 
             'soft_out', use_dropout=False, reuse=None)
         return out
@@ -142,6 +151,9 @@ class SeqMatchSeq(object):
         return now
 
     def proj_layer(self, seq, name, reuse=None):
+        """
+        投影层
+        """
         out1 = self.mlp(seq, self.config.mem_dim, 1, 
                     tf.nn.sigmoid, name + '_sigmoid', reuse=reuse)
         out2 = self.mlp(seq, self.config.mem_dim, 1, 

@@ -33,18 +33,20 @@ class BiMPMConfig(object):
         if self.embeddings is not None:
             self.embedding_size = embeddings.shape[1]
         # keep_prob=1-dropout
-        self.keep_prob = 0.9
+        self.keep_prob = 0.6
         # 学习率
-        self.lr = 0.0005
-        self.grad_clip = 10.
+        self.lr = 0.0002
+        self.grad_clip = 1.
 
         self.num_classes = 2
 
+        # 四种match方法
         self.with_full_match = True
         self.with_maxpool_match = False
         self.with_attentive_match = True
         self.with_max_attentive_match = False
 
+        # 模型参数
         self.use_cudnn = False
         self.with_cosine = True
         self.with_mp_cosine = True
@@ -54,6 +56,7 @@ class BiMPMConfig(object):
         self.context_layer_num = 1
         self.context_lstm_dim = 100
 
+        # highway参数
         self.highway_layer_num = 1
         self.with_highway = True
         self.with_match_highway = True
@@ -62,6 +65,7 @@ class BiMPMConfig(object):
         self.lambda_l2 = 0.0
         self.with_moving_average = False
 
+        # aggregation层参数
         self.aggregation_layer_num = 1
         self.aggregation_lstm_dim = 100
 
@@ -149,8 +153,8 @@ def test(corpus, config):
                     
 
 def main(args):
-    max_q_length = 25
-    max_a_length = 90
+    max_q_length = 40
+    max_a_length = 100
 
     with open(os.path.join(processed_data_path, 'pointwise_corpus.pkl'), 'r') as fr:
         train_corpus, val_corpus, test_corpus = pkl.load(fr)

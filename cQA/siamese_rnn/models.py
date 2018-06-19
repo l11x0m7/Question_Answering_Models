@@ -19,8 +19,10 @@ class SiameseRNN(object):
         # 训练节点
         self.train_op = self.add_train_op(self.total_loss)
 
-    # 输入
     def add_placeholders(self):
+        """
+        输入的容器
+        """
         # 问题
         self.q = tf.placeholder(tf.int32,
                 shape=[None, self.config.max_q_length],
@@ -34,8 +36,10 @@ class SiameseRNN(object):
         self.keep_prob = tf.placeholder(tf.float32, name='keep_prob')
         self.batch_size = tf.shape(self.q)[0]
 
-    # word embeddings
     def add_embeddings(self):
+        """
+        embedding层
+        """
         with tf.variable_scope('embedding'):
             if self.config.embeddings is not None:
                 embeddings = tf.Variable(self.config.embeddings, name="embeddings", trainable=False)
@@ -48,6 +52,9 @@ class SiameseRNN(object):
             return q_embed, a_embed
 
     def network(self, x):
+        """
+        核心网络
+        """
         sequence_length = x.get_shape()[1]
         # (batch_size, time_step, embed_size) -> (time_step, batch_size, embed_size)
         inputs = tf.transpose(x, [1, 0, 2])
@@ -60,9 +67,13 @@ class SiameseRNN(object):
         ac1 = tf.nn.relu(fc1)
         # (batch_size, output_size)
         fc2 = self.fc_layer(ac1, self.config.output_size, "fc2")
-        return fc2
+        ac2 = tf.nn.relu(fc2)
+        return ac2
 
     def fc_layer(self, bottom, n_weight, name):
+        """
+        全连接层
+        """
         assert len(bottom.get_shape()) == 2
         n_prev_weight = bottom.get_shape()[1]
         initer = tf.truncated_normal_initializer(stddev=0.01)
@@ -72,6 +83,9 @@ class SiameseRNN(object):
         return fc
 
     def rnn_layer(self, h):
+        """
+        RNN层
+        """
         if self.config.cell_type == 'lstm':
             birnn_fw, birnn_bw = self.bi_lstm(self.config.rnn_size, self.config.layer_size, self.config.keep_prob)
         else:
@@ -82,7 +96,9 @@ class SiameseRNN(object):
         return output_x1
 
     def bi_lstm(self, rnn_size, layer_size, keep_prob):
-
+        """
+        双向LSTM
+        """
         # forward rnn
         with tf.name_scope('fw_rnn'), tf.variable_scope('fw_rnn'):
             lstm_fw_cell_list = [tf.contrib.rnn.LSTMCell(rnn_size) for _ in xrange(layer_size)]
@@ -96,7 +112,9 @@ class SiameseRNN(object):
         return lstm_fw_cell_m, lstm_bw_cell_m
 
     def bi_gru(self, rnn_size, layer_size, keep_prob):
-
+        """
+        双向GRU
+        """
         # forward rnn
         with tf.name_scope('fw_rnn'), tf.variable_scope('fw_rnn'):
             gru_fw_cell_list = [tf.contrib.rnn.GRUCell(rnn_size) for _ in xrange(layer_size)]
@@ -109,8 +127,10 @@ class SiameseRNN(object):
 
         return gru_fw_cell_m, gru_bw_cell_m
 
-    # 损失节点
     def add_loss_op(self, o1, o2):
+        """
+        损失节点
+        """
         # 此处用cos距离
         norm_o1 = tf.nn.l2_normalize(o1, dim=1)
         norm_o2 = tf.nn.l2_normalize(o2, dim=1)
@@ -122,13 +142,18 @@ class SiameseRNN(object):
         return total_loss
 
     def contrastive_loss(self, Ew, y):
+        """
+        contrasive_loss
+        """
         l_1 = self.config.pos_weight * tf.square(1 - Ew)
         l_0 = tf.square(tf.maximum(Ew, 0))
         loss = tf.reduce_mean(y * l_1 + (1 - y) * l_0)
         return loss
 
-    # 训练节点
     def add_train_op(self, loss):
+        """
+        训练节点
+        """
         with tf.name_scope('train_op'):
             # 记录训练步骤
             self.global_step = tf.Variable(0, name='global_step', trainable=False)

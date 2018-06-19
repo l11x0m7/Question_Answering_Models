@@ -35,16 +35,16 @@ class CNNConfig(object):
         # 不同类型的filter，对应不同的尺寸
         self.filter_sizes = [1, 2, 3, 5, 7, 9]
         # 隐层大小
-        self.hidden_size = 256
+        self.hidden_size = 128
         self.output_size = 128
         # 每种filter的数量
         self.num_filters = 128
         self.l2_reg_lambda = 0.
-        self.keep_prob = 0.8
+        self.keep_prob = 0.6
         # 学习率
-        self.lr = 0.001
+        self.lr = 0.00003
         # contrasive loss 中的 positive loss部分的权重
-        self.pos_weight = 0.25
+        self.pos_weight = 5
 
         self.cf = tf.ConfigProto(allow_soft_placement=True, log_device_placement=False)
         self.cf.gpu_options.per_process_gpu_memory_fraction = 0.2

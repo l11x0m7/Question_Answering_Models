@@ -23,9 +23,10 @@ class QACNN(object):
         # 训练节点
         self.train_op = self.add_train_op(self.total_loss)
 
-
-    # 输入
     def add_placeholders(self):
+        """
+        输入的容器
+        """
         # 问题
         self.q = tf.placeholder(tf.int32,
                 shape=[None, self.config.max_q_length],
@@ -42,8 +43,10 @@ class QACNN(object):
         self.keep_prob = tf.placeholder(tf.float32, name='keep_prob')
         self.batch_size = tf.shape(self.q)[0]
 
-    # word embeddings
     def add_embeddings(self):
+        """
+        embedding层
+        """
         with tf.variable_scope('embedding'):
             if self.config.embeddings is not None:
                 embeddings = tf.Variable(self.config.embeddings, name="embeddings", trainable=False)
@@ -57,8 +60,10 @@ class QACNN(object):
             aminus_embed = tf.nn.dropout(aminus_embed, keep_prob=self.keep_prob)
             return q_embed, aplus_embed, aminus_embed
 
-    # Hidden Layer
     def add_hl(self, q_embed, aplus_embed, aminus_embed):
+        """
+        隐层
+        """
         with tf.variable_scope('HL'):
             W = tf.get_variable('weights', shape=[self.config.embedding_size, self.config.hidden_size], initializer=tf.uniform_unit_scaling_initializer())
             b = tf.get_variable('biases', initializer=tf.constant(0.1, shape=[self.config.hidden_size]))
@@ -68,8 +73,10 @@ class QACNN(object):
             tf.add_to_collection('total_loss', 0.5*self.config.l2_reg_lambda*tf.nn.l2_loss(W))
             return h_q, h_ap, h_am
 
-    # CNN层
     def add_model(self, h_q, h_ap, h_am):
+        """
+        CNN编码层
+        """
         pool_q = list()
         pool_ap = list()
         pool_am = list()
@@ -113,8 +120,11 @@ class QACNN(object):
 
         return real_pool_q, real_pool_ap, real_pool_am
 
-    # 计算cosine
     def calc_cosine(self, real_pool_q, real_pool_ap, real_pool_am):
+        """
+        计算cosine
+        """
+
         normalized_q_h_pool = tf.nn.l2_normalize(real_pool_q, dim=1)
         normalized_pos_h_pool = tf.nn.l2_normalize(real_pool_ap, dim=1)
         normalized_neg_h_pool = tf.nn.l2_normalize(real_pool_am, dim=1)
@@ -123,8 +133,10 @@ class QACNN(object):
 
         return q_ap_cosine, q_am_cosine
 
-    # 损失节点
     def add_loss_op(self, q_ap_cosine, q_am_cosine):
+        """
+        损失节点
+        """
         original_loss = self.config.m - q_ap_cosine + q_am_cosine
         l = tf.maximum(tf.zeros_like(original_loss), original_loss)
         loss = tf.reduce_sum(l)
@@ -133,8 +145,10 @@ class QACNN(object):
         accu = tf.reduce_mean(tf.cast(tf.equal(0., l), tf.float32))
         return total_loss, loss, accu
 
-    # 训练节点
     def add_train_op(self, loss):
+        """
+        训练节点
+        """
         with tf.name_scope('train_op'):
             # 记录训练步骤
             self.global_step = tf.Variable(0, name='global_step', trainable=False)

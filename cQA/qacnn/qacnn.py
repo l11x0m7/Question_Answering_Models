@@ -7,7 +7,7 @@ stdout = sys.stdout
 reload(sys)
 sys.stdout = stdout
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 
 import cPickle as pkl
 from utils import *
