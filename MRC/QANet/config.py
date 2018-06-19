@@ -1,4 +1,5 @@
 from prepro import prepro
+from main import train, test, demo
 
 import tensorflow as tf
 
@@ -88,6 +89,25 @@ flags.DEFINE_integer("char_limit", 16, "Limit length for character")
 flags.DEFINE_integer("word_count_limit", -1, "Min count for word")
 flags.DEFINE_integer("char_count_limit", -1, "Min count for char")
 
+flags.DEFINE_integer("capacity", 15000, "Batch size of dataset shuffle")
+flags.DEFINE_integer("num_threads", 4, "Number of threads in input pipeline")
+flags.DEFINE_boolean("is_bucket", False, "build bucket batch iterator or not")
+# flags.DEFINE_list("bucket_range", [40, 401, 40], "the range of bucket")
+
+flags.DEFINE_integer("batch_size", 32, "Batch size")
+flags.DEFINE_integer("num_steps", 60000, "Number of steps")
+flags.DEFINE_integer("checkpoint", 1000, "checkpoint to save and evaluate the model")
+flags.DEFINE_integer("period", 100, "period to save batch loss")
+flags.DEFINE_integer("val_num_batches", 150, "Number of batches to evaluate the model")
+flags.DEFINE_float("dropout", 0.1, "Dropout prob across the layers")
+flags.DEFINE_float("grad_clip", 5.0, "Global Norm gradient clipping rate")
+flags.DEFINE_float("learning_rate", 0.001, "Learning rate")
+flags.DEFINE_float("decay", 0.9999, "Exponential moving average decay")
+flags.DEFINE_float("l2_norm", 3e-7, "L2 norm scale")
+flags.DEFINE_integer("hidden", 96, "Hidden size")
+flags.DEFINE_integer("num_heads", 1, "Number of heads in self attention")
+flags.DEFINE_integer("early_stop", 10, "Checkpoints for early stop")
+
 glove_char_file = os.path.join(home, "datasets", "glove", "glove.840B.300d-char.txt")
 flags.DEFINE_string("glove_char_file", glove_char_file, "Glove character embedding source file")
 flags.DEFINE_boolean("pretrained_char", False, "Whether to use pretrained character embedding")
@@ -95,6 +115,9 @@ flags.DEFINE_boolean("pretrained_char", False, "Whether to use pretrained charac
 fasttext_file = os.path.join(home, "datasets", "fasttext", "wiki-news-300d-1M.vec")
 flags.DEFINE_string("fasttext_file", fasttext_file, "Fasttext word embedding source file")
 flags.DEFINE_boolean("use_fasttext", False, "Whether to use fasttext")
+
+flags.DEFINE_string('choose_gpu', '0', 'GPU id')
+flags.DEFINE_float('gpu_memory_fraction', 1., 'GPU memory fraction')
 
 def main(_):
     config = flags.FLAGS

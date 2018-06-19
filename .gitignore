@@ -108,7 +108,7 @@ models/
 *.log
 *.DS_Store
 *._*
-*QANet/
+*QANet_others/
 *datasets/
-*/QANet_mine/data/
+MRC/QANet/data/
 *train/
