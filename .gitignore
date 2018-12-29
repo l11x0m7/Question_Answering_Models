@@ -109,6 +109,12 @@ models/
 *.DS_Store
 *._*
 *QANet_others/
+*R-Net_others/
 *datasets/
 MRC/QANet/data/
+MRC/RNet/data/
+*log/
+*logs/
 *train/
+
+*.DS_Store

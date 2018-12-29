@@ -134,6 +134,7 @@ def demo(config):
 
 
 def test(config):
+    os.environ["CUDA_VISIBLE_DEVICES"] = config.choose_gpu
     with open(config.word_emb_file, "r") as fh:
         word_mat = np.array(json.load(fh), dtype=np.float32)
     with open(config.char_emb_file, "r") as fh:
@@ -155,6 +156,7 @@ def test(config):
 
         sess_config = tf.ConfigProto(allow_soft_placement=True)
         sess_config.gpu_options.allow_growth = True
+        sess_config.gpu_options.per_process_gpu_memory_fraction = config.gpu_memory_fraction
 
         with tf.Session(config=sess_config) as sess:
             sess.run(tf.global_variables_initializer())

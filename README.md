@@ -141,9 +141,21 @@ To be done
 
 To be done
 
+### RNet
+
+Refer to:
+
+* [RNet](https://www.microsoft.com/en-us/research/publication/mrc/)
+* [HKUST-KnowComp/R-Net](https://github.com/HKUST-KnowComp/R-Net)
+
+[To this repo](./MRC/RNet)
+
 ### QANet
 
-Refer to 《QANet: Combining Local Convolution with Global Self-Attention for Reading Comprehension》
+Refer to:
+
+* QANet: Combining Local Convolution with Global Self-Attention for Reading Comprehension
+* github repo of [NLPLearn/QANet](https://github.com/NLPLearn/QANet)
 
 [To this repo](./MRC/QANet)
 
