@@ -72,42 +72,6 @@ def summ(memory, hidden_size, mask, keep_prob=1.0, is_train=None, scope="summ"):
         res = tf.reduce_sum(memory * a, axis=1)
         return res
 
-def dot_attention(inputs, memory, hidden_size, mask, keep_prob=1.0, is_train=None, scope="dot_attention"):
-    """
-    inputs: [batch_size, seq_len1, dim]
-    memory: [batch_size, seq_len2, dim]
-    mask: [batch_size, seq_len2]
-
-    return: [batch_size, seq_len1, dim + hidden_size]
-    """
-    with tf.variable_scope(scope):
-        dp_inp = dropout(inputs, keep_prob=keep_prob, is_train=is_train)
-        dp_memo = dropout(memory, keep_prob=keep_prob, is_train=is_train)
-        # JT == seq_len1
-        JT = tf.shape(inputs)[1]
-
-        with tf.variable_scope('attention'):
-            inputs_ = tf.nn.relu(
-                dense(dp_inp, hidden_size, use_bias=False, scope="inputs"))
-            memory_ = tf.nn.relu(
-                dense(dp_memo, hidden_size, use_bias=False, scope="memory"))
-            relation_mat = tf.matmul(inputs_, tf.transpose(
-                memory_, (0, 2, 1))) / (hidden_size ** 0.5)
-            relation_mat = softmax_mask(
-                            relation_mat, tf.tile(
-                                tf.expand_dims(mask, axis=1), (1, JT, 1)))
-            outputs = tf.matmul(tf.nn.softmax(relation_mat), memory)
-            res = tf.concat([inputs, outputs], axis=2)
-
-        with tf.variable_scope('gate'):
-            dim = res.get_shape().as_list()[-1]
-            dp_res = dropout(res, keep_prob=keep_prob, is_train=is_train)
-            gate = tf.nn.sigmoid(dense(dp_res, dim, use_bias=False, scope='gate'))
-            res = gate * res
-
-        return res
-
-
 
 class cudnn_gru(object):
     def __init__(self, num_layers, num_units, batch_size, input_size, keep_prob=1.0, is_train=None, scope='cudnn_gru'):
@@ -129,14 +93,14 @@ class cudnn_gru(object):
                 [gru_bw.params_size()], -0.1, 0.1), validate_shape=False)
             self.params.append((param_fw, param_bw))
 
-            init_fw = tf.zeros([1, batch_size, num_units])
-            init_bw = tf.zeros([1, batch_size, num_units])
+            init_fw = tf.Variable(tf.zeros([1, batch_size, num_units]), trainable=False)
+            init_bw = tf.Variable(tf.zeros([1, batch_size, num_units]), trainable=False)
             # init_fw = tf.tile(tf.zeros((1, 1, num_units), dtype=tf.float32), (1, batch_size, 1))
             # init_bw = tf.tile(tf.zeros((1, 1, num_units), dtype=tf.float32), (1, batch_size, 1))
             self.inits.append((init_fw, init_bw))
 
-            mask_fw = dropout(tf.ones((1, batch_size, input_size_), dtype=tf.float32), keep_prob=keep_prob, is_train=is_train)
-            mask_bw = dropout(tf.ones((1, batch_size, input_size_), dtype=tf.float32), keep_prob=keep_prob, is_train=is_train)
+            mask_fw = dropout(tf.Variable(tf.ones((1, batch_size, input_size_), dtype=tf.float32), trainable=False), keep_prob=keep_prob, is_train=is_train)
+            mask_bw = dropout(tf.Variable(tf.ones((1, batch_size, input_size_), dtype=tf.float32), trainable=False), keep_prob=keep_prob, is_train=is_train)
             self.masks.append((mask_fw, mask_bw))
 
     def __call__(self, inputs, seq_len, keep_prob=1.0, is_train=None, concat=True):

@@ -3,6 +3,7 @@ import ujson as json
 import numpy as np
 from tqdm import tqdm
 import os
+import sys
 
 '''
 This file is taken and modified from R-Net by HKUST-KnowComp
@@ -16,6 +17,9 @@ from util import get_record_parser, convert_tokens, evaluate, get_batch_dataset,
 
 
 def train(config):
+    print(dict(config.__dict__['__flags']))
+    print()
+    print(sys.stdout.flush())
     os.environ["CUDA_VISIBLE_DEVICES"] = config.choose_gpu
 
     with open(config.word_emb_file, "r") as fh:

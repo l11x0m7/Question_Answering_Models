@@ -1,5 +1,8 @@
 # Question_Answering_Models
-This repo collects and re-produces models related to domains of question answering and machine reading comprehension.
+
+This repo collects and re-produces models related to domains of question answering and machine reading comprehension.  
+
+It's now still in the process of supplement.
 
 ## comunity QA
 
@@ -19,7 +22,7 @@ python preprocess_wiki.py
 
 This model is a simple complementation of a Siamese NN QA model with a pointwise way.
 
-[To this repo](./cQA/siamese_nn)
+[To this repo for details](./cQA/siamese_nn)
 
 #### train model
 
@@ -33,7 +36,7 @@ This model is a simple complementation of a Siamese NN QA model with a pointwise
 
 This model is a simple complementation of a Siamese CNN QA model with a pointwise way.
 
-[To this repo](./cQA/siamese_cnn)
+[To this repo for details](./cQA/siamese_cnn)
 
 #### train model
 
@@ -47,7 +50,7 @@ This model is a simple complementation of a Siamese CNN QA model with a pointwis
 
 This model is a simple complementation of a Siamese RNN/LSTM/GRU QA model with a pointwise way.
 
-[To this repo](./cQA/siamese_rnn)
+[To this repo for details](./cQA/siamese_rnn)
 
 #### train model
 
@@ -65,9 +68,9 @@ All these three models above are based on the vanilla siamese structure. You can
 
 Given a question, a positive answer and a negative answer, this pairwise model can rank two answers with higher ranking in terms of the right answer.
 
-Refer to 《APPLYING DEEP LEARNING TO ANSWER SELECTION:A STUDY AND AN OPEN TASK》
+[To this repo for details](./cQA/qacnn)
 
-[To this repo](./cQA/qacnn)
+![](./figures/qacnn.png)
 
 #### train model
 
@@ -77,11 +80,15 @@ Refer to 《APPLYING DEEP LEARNING TO ANSWER SELECTION:A STUDY AND AN OPEN TASK�
 
 `python qacnn.py --test`
 
+Refer to:
+
+* [Applying Deep Learning to Answer Selection: A Study and an Open Task](http://arxiv.org/abs/1508.01585v2)
+
 ### Decomposable Attention Model
 
-Refer to 《A Decomposable Attention Model for Natural Language Inference》
+[To this repo for details](./cQA/decomposable_att_model)
 
-[To this repo](./cQA/decomposable_att_model)
+![](./figures/decomposable_att.png)
 
 #### train model
 
@@ -91,11 +98,15 @@ Refer to 《A Decomposable Attention Model for Natural Language Inference》
 
 `python decomp_att.py --test`
 
+Refer to:
+
+* [A Decomposable Attention Model for Natural Language Inference](http://arxiv.org/abs/1606.01933v2)
+
 ### Compare-Aggregate Model with Multi-Compare
 
-Refer to 《A COMPARE-AGGREGATE MODEL FOR MATCHING TEXT SEQUENCES》
+[To this repo for details](./cQA/seq_match_seq)
 
-[To this repo](./cQA/seq_match_seq)
+![](./figures/multi-compare.png)
 
 #### train model
 
@@ -105,11 +116,17 @@ Refer to 《A COMPARE-AGGREGATE MODEL FOR MATCHING TEXT SEQUENCES》
 
 `python seq_match_seq.py --test`
 
+Refer to:
+
+* [A Compare-Aggregate Model for Matching Text Sequences](http://arxiv.org/abs/1611.01747v1)
+
 ### BiMPM
 
-Refer to 《Bilateral Multi-Perspective Matching for Natural Language Sentence》
+[To this repo for details](./cQA/bimpm)
 
-[To this repo](./cQA/bimpm)
+![](./figures/bimpm1.png)
+
+![](./figures/bimpm2.png)
 
 #### train model
 
@@ -118,6 +135,10 @@ Refer to 《Bilateral Multi-Perspective Matching for Natural Language Sentence�
 #### test model
 
 `python bimpm.py --test`
+
+Refer to:
+
+* [Bilateral Multi-Perspective Matching for Natural Language Sentences](http://arxiv.org/abs/1702.03814v3)
 
 ## Machine Reading Comprehension
 
@@ -129,35 +150,82 @@ CNN/Daily mail, CBT, SQuAD, MS MARCO, RACE
 
 To be done
 
+![GA](./figures/GA.png)
+
+Refer to:
+
+* [Gated-Attention Readers for Text Comprehension](http://arxiv.org/abs/1606.01549v3)
+
 ### SA Reader
 
 To be done
+
+![SAR](./figures/SAR.png)
+
+Refer to:
+
+* [A Thorough Examination of the Cnn/Daily Mail Reading Comprehension Task](http://arxiv.org/abs/1606.02858v2)
 
 ### AoA Reader
 
 To be done
 
+![AoA](./figures/AOA.png)
+
+Refer to:
+
+* Attention-over-Attention Neural Networks for Reading Comprehension
+
 ### BiDAF
 
-To be done
+[To this repo for details](./MRC/BiDAF)
+
+![BiDAF](./figures/BiDAF.png)
+
+The result on dev set(single model) under my experimental environment is shown as follows:
+
+| training step | batch size | hidden size  | EM (%) | F1 (%) |
+| :--------: |:------:|:------:|:------:|:------:|
+| 12W   | 32   | 75   | \ | \ |
+
+Refer to:
+
+* [Bidirectional Attention Flow for Machine Comprehension](https://arxiv.org/abs/1611.01603)
 
 ### RNet
+
+[To this repo for details](./MRC/RNet)
+
+![RNet](./figures/RNet.png)
+
+The result on dev set(single model) under my experimental environment is shown as follows:
+
+| training step | batch size | hidden size  | EM (%) | F1 (%) |
+| :--------: |:------:|:------:|:------:|:------:|
+| 12W   | 32   | 75   | \ | \ |
 
 Refer to:
 
 * [RNet](https://www.microsoft.com/en-us/research/publication/mrc/)
 * [HKUST-KnowComp/R-Net](https://github.com/HKUST-KnowComp/R-Net)
 
-[To this repo](./MRC/RNet)
-
 ### QANet
+
+[To this repo for details](./MRC/QANet)
+
+![QANet](./figures/QANet.png)
+
+The result on dev set(single model) under my experimental environment is shown as follows:
+
+| training step | batch size | hidden size  | EM (%) | F1 (%) |
+| :--------: |:------:|:------:|:------:|:------:|
+| 12W   | 32   | 96   | \ | \ |
+
 
 Refer to:
 
 * QANet: Combining Local Convolution with Global Self-Attention for Reading Comprehension
 * github repo of [NLPLearn/QANet](https://github.com/NLPLearn/QANet)
-
-[To this repo](./MRC/QANet)
 
 ## Information
 

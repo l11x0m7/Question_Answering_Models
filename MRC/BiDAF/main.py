@@ -5,7 +5,7 @@ import ujson as json
 from tqdm import tqdm
 import sys
 
-from model import Model
+from model import BiDAF as Model
 from util import get_record_parser, convert_tokens, evaluate, get_batch_dataset, get_dataset
 
 def train(config):
