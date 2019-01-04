@@ -184,9 +184,13 @@ Refer to:
 
 The result on dev set(single model) under my experimental environment is shown as follows:
 
-| training step | batch size | hidden size  | EM (%) | F1 (%) |
-| :--------: |:------:|:------:|:------:|:------:|
-| 12W   | 32   | 75   | \ | \ |
+| training step | batch size | hidden size  | EM (%) | F1 (%) | speed | device |
+| :--------: |:------:|:------:|:------:|:------:|:------:|:------:|
+| 12W   | 32   | 75   | 67.7 | 77.3 | 3.40 it/s | 1 GTX 1080 Ti |
+
+![](./figures/bidaf_train.png)
+
+![](./figures/bidaf_dev.png)
 
 Refer to:
 
@@ -200,9 +204,13 @@ Refer to:
 
 The result on dev set(single model) under my experimental environment is shown as follows:
 
-| training step | batch size | hidden size  | EM (%) | F1 (%) |
-| :--------: |:------:|:------:|:------:|:------:|
-| 12W   | 32   | 75   | \ | \ |
+| training step | batch size | hidden size  | EM (%) | F1 (%) | speed | device |
+| :--------: |:------:|:------:|:------:|:------:| :------:| :------:| 
+| 12W   | 32   | 75  | 69.1 | 78.2 | 1.35 it/s | 1 GTX 1080 Ti |
+
+![](./figures/rnet_train.png)
+
+![](./figures/rnet_dev.png)
 
 Refer to:
 
@@ -217,9 +225,13 @@ Refer to:
 
 The result on dev set(single model) under my experimental environment is shown as follows:
 
-| training step | batch size | hidden size  | EM (%) | F1 (%) |
-| :--------: |:------:|:------:|:------:|:------:|
-| 12W   | 32   | 96   | \ | \ |
+| training step | batch size | hidden size  | EM (%) | F1 (%) | speed | device |
+| :--------: |:------:|:------:|:------:|:------:|:------:|:------:|
+| 5.2W   | 32   | 96   | 70.2 | 79.7 |2.36 it/s | 1 GTX 1080 Ti |
+
+![](./figures/qanet_train.png)
+
+![](./figures/qanet_dev.png)
 
 
 Refer to:
