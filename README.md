@@ -204,13 +204,22 @@ Refer to:
 
 The result on dev set(single model) under my experimental environment is shown as follows:
 
-| training step | batch size | hidden size  | EM (%) | F1 (%) | speed | device |
-| :--------: |:------:|:------:|:------:|:------:| :------:| :------:| 
-| 12W   | 32   | 75  | 69.1 | 78.2 | 1.35 it/s | 1 GTX 1080 Ti |
+| training step | batch size | hidden size  | EM (%) | F1 (%) | speed | device | RNN type |
+| :--------: |:------:|:------:|:------:|:------:| :------:| :------:| :------:| 
+| 12W   | 32   | 75  | 69.1 | 78.2 | 1.35 it/s | 1 GTX 1080 Ti | cuDNNGRU|
+| 6W   | 64   | 75  | 66.1 | 75.6 | 2.95 s/it | 1 GTX 1080 Ti | SRU |
+
+RNet trained with cuDNNGRU:
 
 ![](./figures/rnet_train.png)
 
 ![](./figures/rnet_dev.png)
+
+RNet trained with SRU(without optimization on operation efficiency):
+
+![](./figures/rnet_sru_train.png)
+
+![](./figures/rnet_sru_dev.png)
 
 Refer to:
 

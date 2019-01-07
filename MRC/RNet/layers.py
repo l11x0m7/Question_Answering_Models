@@ -1,6 +1,7 @@
 # -*- encoding=utf8 -*-
 
 import tensorflow as tf
+from GRU import SRUCell
 
 INF = 1e30
 
@@ -181,6 +182,55 @@ class native_gru(object):
             input_size_ = input_size if layer == 0 else num_units * 2
             gru_fw = tf.contrib.rnn.GRUCell(num_units)
             gru_bw = tf.contrib.rnn.GRUCell(num_units)
+            self.grus.append((gru_fw, gru_bw))
+            init_fw = tf.tile(tf.zeros((1, num_units), dtype=tf.float32), (batch_size, 1))
+            init_bw = tf.tile(tf.zeros((1, num_units), dtype=tf.float32), (batch_size, 1))
+            self.inits.append((init_fw, init_bw))
+            mask_fw = dropout(tf.ones((batch_size, 1, input_size_), dtype=tf.float32), keep_prob=keep_prob, is_train=is_train)
+            mask_bw = dropout(tf.ones((batch_size, 1, input_size_), dtype=tf.float32), keep_prob=keep_prob, is_train=is_train)
+            self.masks.append((mask_fw, mask_bw))
+
+    def __call__(self, inputs, seq_len, keep_prob=1.0, is_train=None, concat=True):
+        """
+        inputs: [batch_size, seq_len, dim]
+        seq_len: [batch_size, ]
+
+        return: [batch_size, seq_len, num_units * 2 * n] or [batch_size, seq_len, num_units * 2]
+        """
+        outputs = [inputs]
+        with tf.variable_scope(self.scope):
+            for layer in range(self.num_layers):
+                gru_fw, gru_bw = self.grus[layer]
+                init_fw, init_bw = self.inits[layer]
+                mask_fw, mask_bw = self.masks[layer]
+                with tf.variable_scope('fw_{}'.format(layer)):
+                    out_fw, _ = tf.nn.dynamic_rnn(gru_fw, outputs[-1] * mask_fw, sequence_length=seq_len, initial_state=init_fw, dtype=tf.float32)
+                with tf.variable_scope('bw_{}'.format(layer)):
+                    input_bw = tf.reverse_sequence(outputs[-1] * mask_bw, seq_lengths=seq_len, seq_dim=1, batch_dim=0)
+                    out_bw, _ = tf.nn.dynamic_rnn(gru_bw, input_bw, sequence_length=seq_len, initial_state=init_bw, dtype=tf.float32)
+                    out_bw = tf.reverse_sequence(out_bw, seq_lengths=seq_len, seq_dim=1, batch_dim=0)
+
+                outputs.append(tf.concat((out_fw, out_bw), axis=2))
+
+            if concat:
+                res = tf.concat(outputs[1:], axis=2)
+            else:
+                res = outputs[-1]
+            return res
+
+
+
+class native_sru(object):
+    def __init__(self, num_layers, num_units, batch_size, input_size, keep_prob=1.0, is_train=None, scope='native_sru'):
+        self.scope = scope
+        self.num_layers = num_layers
+        self.grus = []
+        self.inits = []
+        self.masks = []
+        for layer in range(self.num_layers):
+            input_size_ = input_size if layer == 0 else num_units * 2
+            gru_fw = SRUCell(num_units)
+            gru_bw = SRUCell(num_units)
             self.grus.append((gru_fw, gru_bw))
             init_fw = tf.tile(tf.zeros((1, num_units), dtype=tf.float32), (batch_size, 1))
             init_bw = tf.tile(tf.zeros((1, num_units), dtype=tf.float32), (batch_size, 1))

@@ -1,5 +1,6 @@
 import tensorflow as tf
 from layers import dropout, native_gru, cudnn_gru, ptr_layer, summ, dot_attention
+from layers import native_sru
 
 
 
@@ -64,6 +65,7 @@ class Model(object):
         config = self.config
         N, PL, QL, CL, d, dc, dg = config.batch_size, self.c_maxlen, self.q_maxlen, config.char_limit, config.hidden, config.char_dim, config.char_hidden
         gru = cudnn_gru if config.use_cudnn else native_gru
+        gru = native_sru if config.use_sru else gru
 
         with tf.variable_scope('emb'):
             with tf.variable_scope('char'):
@@ -95,6 +97,7 @@ class Model(object):
                 batch_size=N, input_size=c_emb.get_shape().as_list()[-1], 
                 keep_prob=config.keep_prob, is_train=self.is_train)
             c = rnn(c_emb, seq_len=self.c_len)
+            tf.get_variable_scope().reuse_variables()
             q = rnn(q_emb, seq_len=self.q_len)
 
         with tf.variable_scope('attention'):
