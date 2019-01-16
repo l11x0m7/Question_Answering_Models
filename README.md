@@ -236,8 +236,8 @@ The result on dev set(single model) under my experimental environment is shown a
 
 | training step | batch size |attention heads| hidden size  | EM (%) | F1 (%) | speed | device |
 | :--------: |:------:|:------:|:------:|:------:|:------:|:------:|:------:|
-| 6W   | 32   | 96   | 1 | 70.2 | 79.7 |2.36 it/s | 1 GTX 1080 Ti |
-| 12W   | 32   | 75   | 1 | \ | \ | \ it/s | 1 GTX 1080 Ti |
+| 6W   | 32   | 1   | 96 | 70.2 | 79.7 |2.36 it/s | 1 GTX 1080 Ti |
+| 12W   | 32   | 1   | 75 | \ | \ | \ it/s | 1 GTX 1080 Ti |
 
 ![](./figures/qanet_train.png)
 
