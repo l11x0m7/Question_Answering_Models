@@ -114,6 +114,7 @@ models/
 MRC/QANet/data/
 MRC/RNet/data/
 MRC/BiDAF/data/
+MRC/Hybrid/data/
 *log/
 *logs/
 *train/

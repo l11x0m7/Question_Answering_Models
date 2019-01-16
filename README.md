@@ -234,20 +234,27 @@ Refer to:
 
 The result on dev set(single model) under my experimental environment is shown as follows:
 
-| training step | batch size | hidden size  | EM (%) | F1 (%) | speed | device |
-| :--------: |:------:|:------:|:------:|:------:|:------:|:------:|
-| 5.2W   | 32   | 96   | 70.2 | 79.7 |2.36 it/s | 1 GTX 1080 Ti |
+| training step | batch size |attention heads| hidden size  | EM (%) | F1 (%) | speed | device |
+| :--------: |:------:|:------:|:------:|:------:|:------:|:------:|:------:|
+| 6W   | 32   | 96   | 1 | 70.2 | 79.7 |2.36 it/s | 1 GTX 1080 Ti |
+| 12W   | 32   | 75   | 1 | \ | \ | \ it/s | 1 GTX 1080 Ti |
 
 ![](./figures/qanet_train.png)
 
 ![](./figures/qanet_dev.png)
-
 
 Refer to:
 
 * QANet: Combining Local Convolution with Global Self-Attention for Reading Comprehension
 * github repo of [NLPLearn/QANet](https://github.com/NLPLearn/QANet)
 
+### Hybrid Network
+
+[To this repo for details](./MRC/Hybrid)
+
+This repo contains my experiments and attempt for MRC problems, and I'm still working on it.
+
 ## Information
 
 For more information, please visit http://skyhigh233.com/blog/2018/04/26/cqa-intro/.
+

@@ -9,9 +9,9 @@ flags = tf.flags
 
 home = os.path.join(os.getcwd(), '..')
 
-train_file = os.path.join(home, 'datasets', 'squad2.0', 'train-v2.0.json')
-dev_file = os.path.join(home, 'datasets', 'squad2.0', 'dev-v2.0.json')
-test_file = os.path.join(home, 'datasets', 'squad2.0', 'dev-v2.0.json')
+train_file = os.path.join(home, 'datasets', 'squad', 'train-v1.1.json')
+dev_file = os.path.join(home, 'datasets', 'squad', 'dev-v1.1.json')
+test_file = os.path.join(home, 'datasets', 'squad', 'dev-v1.1.json')
 glove_word_file = os.path.join(home, 'datasets', 'glove', 'glove.840B.300d.txt')
 
 
@@ -104,7 +104,7 @@ flags.DEFINE_float("grad_clip", 5.0, "Global Norm gradient clipping rate")
 flags.DEFINE_float("learning_rate", 0.001, "Learning rate")
 flags.DEFINE_float("decay", 0.9999, "Exponential moving average decay")
 flags.DEFINE_float("l2_norm", 3e-7, "L2 norm scale")
-flags.DEFINE_integer("hidden", 96, "Hidden size")
+flags.DEFINE_integer("hidden", 75, "Hidden size")
 flags.DEFINE_integer("num_heads", 1, "Number of heads in self attention")
 flags.DEFINE_integer("early_stop", 10, "Checkpoints for early stop")
 
@@ -116,7 +116,7 @@ fasttext_file = os.path.join(home, "datasets", "fasttext", "wiki-news-300d-1M.ve
 flags.DEFINE_string("fasttext_file", fasttext_file, "Fasttext word embedding source file")
 flags.DEFINE_boolean("use_fasttext", False, "Whether to use fasttext")
 
-flags.DEFINE_string('choose_gpu', '1', 'GPU id')
+flags.DEFINE_string('choose_gpu', '0', 'GPU id')
 flags.DEFINE_float('gpu_memory_fraction', 1., 'GPU memory fraction')
 
 def main(_):
