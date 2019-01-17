@@ -236,8 +236,8 @@ The result on dev set(single model) under my experimental environment is shown a
 
 | training step | batch size |attention heads| hidden size  | EM (%) | F1 (%) | speed | device |
 | :--------: |:------:|:------:|:------:|:------:|:------:|:------:|:------:|
-| 6W   | 32   | 1   | 96 | 70.2 | 79.7 |2.36 it/s | 1 GTX 1080 Ti |
-| 12W   | 32   | 1   | 75 | \ | \ | \ it/s | 1 GTX 1080 Ti |
+| 6W   | 32   | 1   | 96 | 70.2 | 79.7 |2.4 it/s | 1 GTX 1080 Ti |
+| 12W   | 32   | 1   | 75 | 70.1 | 79.4 | 2.4 it/s | 1 GTX 1080 Ti |
 
 ![](./figures/qanet_train.png)
 
@@ -253,6 +253,11 @@ Refer to:
 [To this repo for details](./MRC/Hybrid)
 
 This repo contains my experiments and attempt for MRC problems, and I'm still working on it.
+
+| training step | batch size | hidden size  | EM (%) | F1 (%) | speed | device |
+| :--------: |:------:|:------:|:------:|:------:|:------:|:------:|
+| 12W   | 32  | 100 | 70.1 | 78.9 |1.6 it/s | 1 GTX 1080 Ti |
+| 12W   | 32  | 75 | 70.0 | 79.1 | 1.8 it/s | 1 GTX 1080 Ti |
 
 ## Information
 

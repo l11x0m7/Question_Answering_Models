@@ -110,7 +110,7 @@ fasttext_file = os.path.join(home, "datasets", "fasttext", "wiki-news-300d-1M.ve
 flags.DEFINE_string("fasttext_file", fasttext_file, "Fasttext word embedding")
 flags.DEFINE_boolean("fasttext", False, "Whether to use fasttext")
 
-flags.DEFINE_string('choose_gpu', '1', 'GPU id')
+flags.DEFINE_string('choose_gpu', '0', 'GPU id')
 flags.DEFINE_float('gpu_memory_fraction', 1., 'GPU memory fraction')
 
 
