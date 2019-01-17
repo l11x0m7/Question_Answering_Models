@@ -239,9 +239,17 @@ The result on dev set(single model) under my experimental environment is shown a
 | 6W   | 32   | 1   | 96 | 70.2 | 79.7 |2.4 it/s | 1 GTX 1080 Ti |
 | 12W   | 32   | 1   | 75 | 70.1 | 79.4 | 2.4 it/s | 1 GTX 1080 Ti |
 
+Experimental records for the first experiment:
+
 ![](./figures/qanet_train.png)
 
 ![](./figures/qanet_dev.png)
+
+Experimental records for the second experiment(without smooth):
+
+![](./figures/qanet_train_2.png)
+
+![](./figures/qanet_dev_2.png)
 
 Refer to:
 
@@ -258,6 +266,18 @@ This repo contains my experiments and attempt for MRC problems, and I'm still wo
 | :--------: |:------:|:------:|:------:|:------:|:------:|:------:|
 | 12W   | 32  | 100 | 70.1 | 78.9 |1.6 it/s | 1 GTX 1080 Ti |
 | 12W   | 32  | 75 | 70.0 | 79.1 | 1.8 it/s | 1 GTX 1080 Ti |
+
+Experimental records for the first experiment(without smooth):
+
+![](./figures/hybrid_train_1.png)
+
+![](./figures/hybrid_dev_1.png)
+
+Experimental records for the second experiment(without smooth):
+
+![](./figures/hybrid_train_2.png)
+
+![](./figures/hybrid_dev_2.png)
 
 ## Information
 
