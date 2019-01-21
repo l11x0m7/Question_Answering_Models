@@ -262,10 +262,11 @@ Refer to:
 
 This repo contains my experiments and attempt for MRC problems, and I'm still working on it.
 
-| training step | batch size | hidden size  | EM (%) | F1 (%) | speed | device |
-| :--------: |:------:|:------:|:------:|:------:|:------:|:------:|
-| 12W   | 32  | 100 | 70.1 | 78.9 |1.6 it/s | 1 GTX 1080 Ti |
-| 12W   | 32  | 75 | 70.0 | 79.1 | 1.8 it/s | 1 GTX 1080 Ti |
+| training step | batch size | hidden size  | EM (%) | F1 (%) | speed | device | description |
+| :--------: |:------:|:------:|:------:|:------:|:------:|:------:|:------:|
+| 12W   | 32  | 100 | 70.1 | 78.9 |1.6 it/s | 1 GTX 1080 Ti | \ |
+| 12W   | 32  | 75 | 70.0 | 79.1 | 1.8 it/s | 1 GTX 1080 Ti | \ |
+| 12W   | 32  | 75 | 69.5 | 78.8 | 1.8 it/s | 1 GTX 1080 Ti |with spatial dropout on embeddings|
 
 Experimental records for the first experiment(without smooth):
 

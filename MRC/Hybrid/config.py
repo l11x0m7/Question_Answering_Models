@@ -14,9 +14,9 @@ test_file = os.path.join(home, "datasets", "squad", "dev-v1.1.json")
 glove_word_file = os.path.join(home, "datasets", "glove", "glove.840B.300d.txt")
 
 target_dir = "data"
-log_dir = "log/event_1_1_75"
-save_dir = "log/model_1_1_75"
-answer_dir = "log/answer_1_1_75"
+log_dir = "log/event_3_1_75_sdp"
+save_dir = "log/model_3_1_75_sdp"
+answer_dir = "log/answer_3_1_75_sdp"
 train_record_file = os.path.join(target_dir, "train.tfrecords")
 dev_record_file = os.path.join(target_dir, "dev.tfrecords")
 test_record_file = os.path.join(target_dir, "test.tfrecords")
@@ -83,6 +83,8 @@ flags.DEFINE_integer("capacity", 15000, "Batch size of dataset shuffle")
 flags.DEFINE_integer("num_threads", 4, "Number of threads in input pipeline")
 flags.DEFINE_boolean("use_cudnn", True, "Whether to use cudnn (only for GPU)")
 flags.DEFINE_boolean("is_bucket", False, "Whether to use bucketing")
+flags.DEFINE_boolean("use_spatial_dp", True, "Whether to use spatial dropout on word embeddings")
+flags.DEFINE_string("use_ghmc_or_ghmr", '', "Whether to use GHMC Loss or GHMR Loss")
 # flags.DEFINE_list("bucket_range", [40, 361, 40], "range of bucket")
 
 flags.DEFINE_integer("batch_size", 32, "Batch size")
@@ -110,7 +112,7 @@ fasttext_file = os.path.join(home, "datasets", "fasttext", "wiki-news-300d-1M.ve
 flags.DEFINE_string("fasttext_file", fasttext_file, "Fasttext word embedding")
 flags.DEFINE_boolean("fasttext", False, "Whether to use fasttext")
 
-flags.DEFINE_string('choose_gpu', '0', 'GPU id')
+flags.DEFINE_string('choose_gpu', '1', 'GPU id')
 flags.DEFINE_float('gpu_memory_fraction', 1., 'GPU memory fraction')
 
 

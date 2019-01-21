@@ -1,6 +1,7 @@
 import tensorflow as tf
 from layers import dropout, native_gru, cudnn_gru, ptr_layer, summ, softmax_mask, dense
 from layers import dot_attention
+from loss import GHMC_loss, GHMR_loss
 
 
 class Hybrid(object):
@@ -105,8 +106,23 @@ class Hybrid(object):
                 c_emb = tf.nn.embedding_lookup(self.word_mat, self.c)
                 q_emb = tf.nn.embedding_lookup(self.word_mat, self.q)
 
-            c_emb = tf.concat([c_emb, ch_emb], axis=2)
-            q_emb = tf.concat([q_emb, qh_emb], axis=2)
+            c_emb_ori = tf.concat([c_emb, ch_emb], axis=2)
+            q_emb_ori = tf.concat([q_emb, qh_emb], axis=2)
+
+            # spatial dropout
+            if config.use_spatial_dp:
+                print("Using spatial dropout\n")
+                if self.is_train:
+                    q_emb_shape = tf.shape(q_emb_ori)
+                    c_emb_shape = tf.shape(c_emb_ori)
+                    q_emb = tf.nn.dropout(q_emb_ori, keep_prob=0.5 + config.keep_prob / 2, noise_shape=(q_emb_shape[0], 1, q_emb_shape[2]))
+                    c_emb = tf.nn.dropout(c_emb_ori, keep_prob=0.5 + config.keep_prob / 2, noise_shape=(c_emb_shape[0], 1, c_emb_shape[2]))
+                else:
+                    q_emb = q_emb_ori
+                    c_emb = c_emb_ori
+            else:
+                c_emb = c_emb_ori
+                q_emb = q_emb_ori
 
         # context encoding: method1
         with tf.variable_scope('encoding'):
@@ -210,12 +226,23 @@ class Hybrid(object):
 
             # loss1 = tf.nn.softmax_cross_entropy_with_logits_v2(
             #         logits=logits1, labels=tf.stop_gradient(self.y1))
-            loss1 = tf.nn.softmax_cross_entropy_with_logits(
-                    logits=logits1, labels=tf.stop_gradient(self.y1))
             # loss2 = tf.nn.softmax_cross_entropy_with_logits_v2(
             #         logits=logits2, labels=tf.stop_gradient(self.y2))
-            loss2 = tf.nn.softmax_cross_entropy_with_logits(
-                    logits=logits2, labels=tf.stop_gradient(self.y2))
+            if config.use_ghmc_or_ghmr == 'ghmc':
+                print('Using GHMC Loss\n')
+                ghmc_loss_func = GHMC_loss(momentum=0.)
+                loss1 = ghmc_loss_func(logits1, tf.stop_gradient(self.y1))
+                loss2 = ghmc_loss_func(logits2, tf.stop_gradient(self.y2))
+            elif config.use_ghmc_or_ghmr == 'ghmr':
+                print('Using GHMR Loss\n')
+                ghmr_loss_func = GHMR_loss()
+                loss1 = ghmr_loss_func(logits1, tf.stop_gradient(self.y1))
+                loss2 = ghmr_loss_func(logits2, tf.stop_gradient(self.y2))
+            else:
+                loss1 = tf.nn.softmax_cross_entropy_with_logits(
+                        logits=logits1, labels=tf.stop_gradient(self.y1))
+                loss2 = tf.nn.softmax_cross_entropy_with_logits(
+                        logits=logits2, labels=tf.stop_gradient(self.y2))
             self.loss = tf.reduce_mean(loss1 + loss2)
 
     def bilinear_attention_layer(self, document, query, doc_mask):
