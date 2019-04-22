@@ -111,6 +111,7 @@ models/
 *QANet_others/
 *R-Net_others/
 *datasets/
+MRC/data/
 MRC/QANet/data/
 MRC/RNet/data/
 MRC/BiDAF/data/

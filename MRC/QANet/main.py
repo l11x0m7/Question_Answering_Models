@@ -17,7 +17,7 @@ from util import get_record_parser, convert_tokens, evaluate, get_batch_dataset,
 
 
 def train(config):
-    print(dict(config.__dict__['__flags']))
+    # print(dict(config.__dict__['__flags']))
     print()
     print(sys.stdout.flush())
     os.environ["CUDA_VISIBLE_DEVICES"] = config.choose_gpu
