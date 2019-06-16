@@ -130,6 +130,7 @@ class QANet(object):
             # C = tf.tile(tf.expand_dims(c,2),[1,1,self.q_maxlen,1])
             # Q = tf.tile(tf.expand_dims(q,1),[1,self.c_maxlen,1,1])
             # S = trilinear([C, Q, C*Q], input_keep_prob = 1.0 - self.dropout)
+            # [batch, p_len, q_len]
             S = optimized_trilinear_for_attention([c, q], self.c_maxlen, self.q_maxlen, input_keep_prob = 1.0 - self.dropout)
             mask_q = tf.expand_dims(self.q_mask, 1)
             S_ = tf.nn.softmax(mask_logits(S, mask = mask_q))
@@ -137,6 +138,7 @@ class QANet(object):
             S_T = tf.transpose(tf.nn.softmax(mask_logits(S, mask = mask_c), dim = 1),(0,2,1))
             self.c2q = tf.matmul(S_, q)
             self.q2c = tf.matmul(tf.matmul(S_, S_T), c)
+            # [batch, p_len, 4*h]
             attention_outputs = [c, self.c2q, c * self.c2q, c * self.q2c]
 
         with tf.variable_scope("Model_Encoder_Layer"):
@@ -161,7 +163,9 @@ class QANet(object):
                     )
 
         with tf.variable_scope("Output_Layer"):
+            # [batch, p_len]
             start_logits = tf.squeeze(conv(tf.concat([self.enc[1], self.enc[2]],axis = -1),1, bias = False, name = "start_pointer"),-1)
+            # [batch, p_len]
             end_logits = tf.squeeze(conv(tf.concat([self.enc[1], self.enc[3]],axis = -1),1, bias = False, name = "end_pointer"), -1)
             self.logits = [mask_logits(start_logits, mask = self.c_mask),
                            mask_logits(end_logits, mask = self.c_mask)]

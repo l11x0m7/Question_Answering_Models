@@ -349,6 +349,7 @@ def optimized_trilinear_for_attention(args, c_maxlen, q_maxlen, input_keep_prob=
     """
     args[0]: [batch, p_len, dim]
     args[1]: [batch, q_len, dim]
+    out: [batch, p_len, q_len]
     """
     assert len(args) == 2, "just use for computing attention with two input"
     arg0_shape = args[0].get_shape().as_list()
